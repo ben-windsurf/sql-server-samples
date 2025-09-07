@@ -117,7 +117,8 @@ def create_revenue_trend_chart(df, output_path='revenue_trends.png'):
     ax1.grid(True, alpha=0.3)
     ax1.tick_params(axis='x', rotation=45)
     
-    ax1.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'${x:,.0f}'))
+    from matplotlib.ticker import FuncFormatter
+    ax1.yaxis.set_major_formatter(FuncFormatter(lambda x, p: f'${x:,.0f}'))
     
     ax2.plot(df['Month_Year_Label'], df['Margin_Percentage'], 
              marker='D', linewidth=2, markersize=6, color='#F18F01', label='Margin %')

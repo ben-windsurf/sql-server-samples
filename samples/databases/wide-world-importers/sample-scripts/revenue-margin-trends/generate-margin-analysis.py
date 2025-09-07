@@ -135,7 +135,8 @@ def create_profitability_analysis(df, output_path='profitability_analysis.png'):
     category_margins = [df[df['Category'] == cat]['Margin_Percentage'].values for cat in categories]
     
     bp = ax1.boxplot(category_margins, labels=categories, patch_artist=True)
-    colors = plt.cm.Set3(np.linspace(0, 1, len(categories)))
+    import matplotlib.cm as cm
+    colors = cm.get_cmap('Set3')(np.linspace(0, 1, len(categories)))
     for patch, color in zip(bp['boxes'], colors):
         patch.set_facecolor(color)
     
@@ -169,7 +170,7 @@ def create_profitability_analysis(df, output_path='profitability_analysis.png'):
     ax3.tick_params(axis='x', rotation=45)
     
     category_profit = df.groupby('Category')['Profit'].sum().nlargest(8)
-    colors_pie = plt.cm.Set3(np.linspace(0, 1, len(category_profit)))
+    colors_pie = cm.get_cmap('Set3')(np.linspace(0, 1, len(category_profit)))
     
     wedges, texts, autotexts = ax4.pie(category_profit.values, labels=category_profit.index, 
                                       autopct='%1.1f%%', colors=colors_pie, startangle=90)
