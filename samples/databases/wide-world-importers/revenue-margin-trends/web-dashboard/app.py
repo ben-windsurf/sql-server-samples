@@ -1,10 +1,10 @@
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
-import pyodbc
+import pymssql
 import json
 from datetime import datetime, timedelta
 import os
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 app = Flask(__name__)
 CORS(app)
@@ -18,10 +18,16 @@ DB_CONFIG = {
 
 def get_db_connection():
     """Create database connection"""
-    conn_str = f"DRIVER={DB_CONFIG['driver']};SERVER={DB_CONFIG['server']};DATABASE={DB_CONFIG['database']};Trusted_Connection={DB_CONFIG['trusted_connection']}"
-    return pyodbc.connect(conn_str)
+    return pymssql.connect(
+        server=DB_CONFIG['server'],
+        database=DB_CONFIG['database'],
+        user=os.getenv('DB_USER', ''),
+        password=os.getenv('DB_PASSWORD', ''),
+        timeout=30,
+        login_timeout=30
+    )
 
-def execute_query(query: str, params: tuple = None) -> List[Dict[str, Any]]:
+def execute_query(query: str, params: Optional[tuple] = None) -> List[Dict[str, Any]]:
     """Execute SQL query and return results as list of dictionaries"""
     try:
         conn = get_db_connection()
