@@ -1,0 +1,226 @@
+-- Sample MDX Queries for WWI Revenue Margin Cube
+-- These queries demonstrate common analysis scenarios for 12-month revenue and margin trends
+
+-- =====================================================================================
+-- 1. BASIC MONTHLY REVENUE TREND
+-- Shows monthly revenue for the current year
+-- =====================================================================================
+SELECT 
+    {[Measures].[Revenue Excluding Tax], [Measures].[Profit], [Measures].[Margin Percentage]} ON COLUMNS,
+    [Date].[Calendar].[Month].Members ON ROWS
+FROM [WWI Revenue Margin Cube]
+WHERE [Date].[Calendar].[Year].[2016];
+
+-- =====================================================================================
+-- 2. YEAR-OVER-YEAR COMPARISON
+-- Compares current year revenue with previous year by month
+-- =====================================================================================
+WITH 
+MEMBER [Measures].[Revenue Growth Amount] AS
+    [Measures].[Revenue Excluding Tax] - [Measures].[Revenue PY Same Month]
+
+SELECT 
+    {[Measures].[Revenue Excluding Tax], 
+     [Measures].[Revenue PY Same Month], 
+     [Measures].[Revenue YoY Growth %],
+     [Measures].[Revenue Growth Amount]} ON COLUMNS,
+    [Date].[Calendar].[Month].Members ON ROWS
+FROM [WWI Revenue Margin Cube]
+WHERE [Date].[Calendar].[Year].[2016];
+
+-- =====================================================================================
+-- 3. ROLLING 12-MONTH ANALYSIS
+-- Shows rolling 12-month totals and trends
+-- =====================================================================================
+SELECT 
+    {[Measures].[Revenue Excluding Tax],
+     [Measures].[Rolling 12M Revenue], 
+     [Measures].[Rolling 12M Profit],
+     [Measures].[Rolling 12M Margin %]} ON COLUMNS,
+    LastPeriods(12, [Date].[Calendar].[Month].[December 2016]) ON ROWS
+FROM [WWI Revenue Margin Cube];
+
+-- =====================================================================================
+-- 4. TOP 10 CUSTOMERS BY REVENUE
+-- Identifies highest revenue customers for trend analysis
+-- =====================================================================================
+SELECT 
+    {[Measures].[Revenue Excluding Tax], 
+     [Measures].[Profit], 
+     [Measures].[Margin Percentage],
+     [Measures].[Revenue per Customer]} ON COLUMNS,
+    TopCount([Customer].[Customer].[Customer].Members, 10, [Measures].[Revenue Excluding Tax]) ON ROWS
+FROM [WWI Revenue Margin Cube]
+WHERE [Date].[Calendar].[Year].[2016];
+
+-- =====================================================================================
+-- 5. CUSTOMER CATEGORY PERFORMANCE
+-- Analyzes revenue and margin trends by customer segments
+-- =====================================================================================
+SELECT 
+    {[Measures].[Revenue Excluding Tax], 
+     [Measures].[Profit], 
+     [Measures].[Margin Percentage],
+     [Measures].[Invoice Count]} ON COLUMNS,
+    [Customer].[Customer Hierarchy].[Customer Category].Members ON ROWS
+FROM [WWI Revenue Margin Cube]
+WHERE [Date].[Calendar].[Year].[2016];
+
+-- =====================================================================================
+-- 6. QUARTERLY TREND ANALYSIS
+-- Shows quarterly performance with growth rates
+-- =====================================================================================
+WITH 
+MEMBER [Measures].[Quarterly Growth %] AS
+    ([Measures].[Revenue Excluding Tax] - 
+     ([Measures].[Revenue Excluding Tax], [Date].[Calendar].CurrentMember.PrevMember)) /
+    ([Measures].[Revenue Excluding Tax], [Date].[Calendar].CurrentMember.PrevMember) * 100
+
+SELECT 
+    {[Measures].[Revenue Excluding Tax], 
+     [Measures].[Profit], 
+     [Measures].[Margin Percentage],
+     [Measures].[Quarterly Growth %]} ON COLUMNS,
+    [Date].[Calendar].[Quarter].Members ON ROWS
+FROM [WWI Revenue Margin Cube]
+WHERE [Date].[Calendar].[Year].[2016];
+
+-- =====================================================================================
+-- 7. PRODUCT PERFORMANCE ANALYSIS
+-- Top performing products by revenue and margin
+-- =====================================================================================
+SELECT 
+    {[Measures].[Revenue Excluding Tax], 
+     [Measures].[Profit], 
+     [Measures].[Margin Percentage],
+     [Measures].[Quantity]} ON COLUMNS,
+    TopCount([Stock Item].[Stock Item].[Stock Item].Members, 20, [Measures].[Revenue Excluding Tax]) ON ROWS
+FROM [WWI Revenue Margin Cube]
+WHERE [Date].[Calendar].[Year].[2016];
+
+-- =====================================================================================
+-- 8. MONTH-OVER-MONTH TREND ANALYSIS
+-- Shows monthly trends with growth indicators
+-- =====================================================================================
+SELECT 
+    {[Measures].[Revenue Excluding Tax], 
+     [Measures].[Revenue Previous Month],
+     [Measures].[Revenue MoM Growth %],
+     [Measures].[Revenue Trend],
+     [Measures].[3Month Avg Revenue]} ON COLUMNS,
+    [Date].[Calendar].[Month].Members ON ROWS
+FROM [WWI Revenue Margin Cube]
+WHERE [Date].[Calendar].[Year].[2016];
+
+-- =====================================================================================
+-- 9. FISCAL YEAR ANALYSIS
+-- Analyzes performance using fiscal year calendar
+-- =====================================================================================
+SELECT 
+    {[Measures].[Revenue Excluding Tax], 
+     [Measures].[Profit], 
+     [Measures].[Margin Percentage]} ON COLUMNS,
+    [Date].[Fiscal].[Fiscal Year].Members ON ROWS
+FROM [WWI Revenue Margin Cube];
+
+-- =====================================================================================
+-- 10. SEASONAL PATTERN ANALYSIS
+-- Compares same months across multiple years to identify seasonal patterns
+-- =====================================================================================
+WITH 
+SET [Years] AS {[Date].[Calendar].[Year].[2013], [Date].[Calendar].[Year].[2014], [Date].[Calendar].[Year].[2015], [Date].[Calendar].[Year].[2016]}
+SET [Months] AS [Date].[Calendar].[Month].Members
+
+SELECT 
+    [Measures].[Revenue Excluding Tax] ON COLUMNS,
+    CrossJoin([Months], [Years]) ON ROWS
+FROM [WWI Revenue Margin Cube];
+
+-- =====================================================================================
+-- 11. MARGIN TREND ANALYSIS
+-- Focuses specifically on margin trends and profitability
+-- =====================================================================================
+WITH 
+MEMBER [Measures].[Margin Trend Direction] AS
+    IIF([Measures].[Margin Percentage] > 
+        ([Measures].[Margin Percentage], [Date].[Calendar].CurrentMember.PrevMember),
+        "Improving", "Declining")
+
+SELECT 
+    {[Measures].[Margin Percentage], 
+     [Measures].[Profit], 
+     [Measures].[Revenue Excluding Tax],
+     [Measures].[Margin Trend Direction]} ON COLUMNS,
+    [Date].[Calendar].[Month].Members ON ROWS
+FROM [WWI Revenue Margin Cube]
+WHERE [Date].[Calendar].[Year].[2016];
+
+-- =====================================================================================
+-- 12. COMPREHENSIVE DASHBOARD QUERY
+-- Multi-dimensional analysis for executive dashboard
+-- =====================================================================================
+WITH 
+MEMBER [Measures].[Revenue Target] AS 1000000  -- Example target
+MEMBER [Measures].[Revenue vs Target %] AS
+    [Measures].[Revenue Excluding Tax] / [Measures].[Revenue Target] * 100
+
+SELECT 
+    {[Measures].[Revenue Excluding Tax],
+     [Measures].[Revenue Target],
+     [Measures].[Revenue vs Target %],
+     [Measures].[Profit], 
+     [Measures].[Margin Percentage],
+     [Measures].[Revenue YoY Growth %],
+     [Measures].[Rolling 12M Revenue],
+     [Measures].[Invoice Count]} ON COLUMNS,
+    [Date].[Calendar].[Month].Members ON ROWS
+FROM [WWI Revenue Margin Cube]
+WHERE [Date].[Calendar].[Year].[2016];
+
+-- =====================================================================================
+-- 13. CUSTOMER SEGMENT TREND COMPARISON
+-- Compares trends across different customer segments
+-- =====================================================================================
+SELECT 
+    {[Measures].[Revenue Excluding Tax], 
+     [Measures].[Revenue YoY Growth %],
+     [Measures].[Margin Percentage]} ON COLUMNS,
+    CrossJoin([Customer].[Customer Hierarchy].[Customer Category].Members,
+              [Date].[Calendar].[Month].Members) ON ROWS
+FROM [WWI Revenue Margin Cube]
+WHERE [Date].[Calendar].[Year].[2016];
+
+-- =====================================================================================
+-- 14. PERFORMANCE RANKING ANALYSIS
+-- Ranks months by performance metrics
+-- =====================================================================================
+WITH 
+SET [Top Revenue Months] AS 
+    TopCount([Date].[Calendar].[Month].Members, 5, [Measures].[Revenue Excluding Tax])
+SET [Top Margin Months] AS 
+    TopCount([Date].[Calendar].[Month].Members, 5, [Measures].[Margin Percentage])
+
+SELECT 
+    {[Measures].[Revenue Excluding Tax], 
+     [Measures].[Margin Percentage]} ON COLUMNS,
+    Union([Top Revenue Months], [Top Margin Months]) ON ROWS
+FROM [WWI Revenue Margin Cube]
+WHERE [Date].[Calendar].[Year].[2016];
+
+-- =====================================================================================
+-- 15. FORECAST PREPARATION QUERY
+-- Provides data structure suitable for forecasting models
+-- =====================================================================================
+WITH 
+MEMBER [Measures].[Revenue Trend Score] AS
+    ([Measures].[Revenue Excluding Tax] - [Measures].[3Month Avg Revenue]) / [Measures].[3Month Avg Revenue]
+
+SELECT 
+    {[Measures].[Revenue Excluding Tax],
+     [Measures].[3Month Avg Revenue],
+     [Measures].[Rolling 12M Revenue],
+     [Measures].[Revenue YoY Growth %],
+     [Measures].[Revenue MoM Growth %],
+     [Measures].[Revenue Trend Score]} ON COLUMNS,
+    LastPeriods(24, [Date].[Calendar].[Month].[December 2016]) ON ROWS
+FROM [WWI Revenue Margin Cube];

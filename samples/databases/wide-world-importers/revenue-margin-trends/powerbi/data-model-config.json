@@ -1,0 +1,171 @@
+{
+  "dataModel": {
+    "name": "WWI Revenue Margin Trends",
+    "description": "12-month revenue and margin trend analysis for WideWorldImportersDW",
+    "version": "1.0",
+    "dataSources": [
+      {
+        "name": "WideWorldImportersDW",
+        "connectionString": "Data Source={ServerName};Initial Catalog=WideWorldImportersDW;Integrated Security=True",
+        "provider": "System.Data.SqlClient",
+        "type": "SqlServer"
+      }
+    ],
+    "tables": [
+      {
+        "name": "MonthlyRevenueTrends",
+        "source": "sql-queries/01-monthly-revenue-trends.sql",
+        "refreshMode": "Import",
+        "description": "Monthly revenue and margin trends with growth calculations"
+      },
+      {
+        "name": "FiscalYearTrends", 
+        "source": "sql-queries/02-fiscal-year-trends.sql",
+        "refreshMode": "Import",
+        "description": "Fiscal year based revenue and margin analysis"
+      },
+      {
+        "name": "Rolling12MonthAnalysis",
+        "source": "sql-queries/03-rolling-12month-analysis.sql", 
+        "refreshMode": "Import",
+        "description": "Rolling 12-month metrics and trend analysis"
+      },
+      {
+        "name": "CustomerSegmentTrends",
+        "source": "sql-queries/04-customer-segment-trends.sql",
+        "refreshMode": "Import", 
+        "description": "Revenue and margin trends by customer segments"
+      },
+      {
+        "name": "ProductCategoryTrends",
+        "source": "sql-queries/05-product-category-trends.sql",
+        "refreshMode": "Import",
+        "description": "Product category performance and trends"
+      }
+    ],
+    "relationships": [
+      {
+        "fromTable": "MonthlyRevenueTrends",
+        "fromColumn": "Month",
+        "toTable": "FiscalYearTrends", 
+        "toColumn": "Calendar Month",
+        "crossFilterDirection": "Both",
+        "cardinality": "OneToOne"
+      }
+    ],
+    "measures": [
+      {
+        "name": "Total Revenue",
+        "expression": "SUM(MonthlyRevenueTrends[Revenue Excluding Tax])",
+        "formatString": "$#,##0",
+        "description": "Total revenue excluding tax"
+      },
+      {
+        "name": "Total Profit", 
+        "expression": "SUM(MonthlyRevenueTrends[Profit])",
+        "formatString": "$#,##0",
+        "description": "Total profit margin"
+      },
+      {
+        "name": "Average Margin %",
+        "expression": "AVERAGE(MonthlyRevenueTrends[Margin Percentage])",
+        "formatString": "0.00%",
+        "description": "Average profit margin percentage"
+      },
+      {
+        "name": "Revenue Growth Rate",
+        "expression": "AVERAGE(MonthlyRevenueTrends[Revenue Growth Rate %])",
+        "formatString": "0.00%", 
+        "description": "Average month-over-month revenue growth rate"
+      }
+    ],
+    "parameters": [
+      {
+        "name": "StartDate",
+        "type": "DateTime",
+        "defaultValue": "2016-01-01",
+        "description": "Analysis start date"
+      },
+      {
+        "name": "EndDate", 
+        "type": "DateTime",
+        "defaultValue": "2016-12-31",
+        "description": "Analysis end date"
+      },
+      {
+        "name": "FiscalYearStart",
+        "type": "Number",
+        "defaultValue": 7,
+        "description": "Fiscal year start month (1-12)"
+      }
+    ]
+  },
+  "visualizations": [
+    {
+      "name": "Revenue Trend Line Chart",
+      "type": "lineChart",
+      "xAxis": "Month",
+      "yAxis": "Revenue Excluding Tax",
+      "legend": "Revenue Trend",
+      "page": "Overview"
+    },
+    {
+      "name": "Margin Trend Line Chart", 
+      "type": "lineChart",
+      "xAxis": "Month",
+      "yAxis": "Margin Percentage", 
+      "legend": "Margin Trend",
+      "page": "Overview"
+    },
+    {
+      "name": "Revenue KPI Card",
+      "type": "card",
+      "measure": "Total Revenue",
+      "page": "Overview"
+    },
+    {
+      "name": "Profit KPI Card",
+      "type": "card", 
+      "measure": "Total Profit",
+      "page": "Overview"
+    },
+    {
+      "name": "Customer Segment Performance",
+      "type": "barChart",
+      "xAxis": "Customer Segment",
+      "yAxis": "Segment Revenue Excluding Tax",
+      "page": "Detailed Analysis"
+    },
+    {
+      "name": "Product Category Matrix",
+      "type": "matrix",
+      "rows": "Product Name",
+      "columns": "Month", 
+      "values": "Product Revenue Excluding Tax",
+      "page": "Detailed Analysis"
+    },
+    {
+      "name": "Rolling 12M Metrics",
+      "type": "lineChart",
+      "xAxis": "Report Date",
+      "yAxis": "Rolling 12M Revenue",
+      "secondaryAxis": "Rolling 12M Margin %",
+      "page": "Trend Analysis"
+    },
+    {
+      "name": "YoY Comparison",
+      "type": "columnChart",
+      "xAxis": "Month",
+      "yAxis": "Revenue Excluding Tax",
+      "legend": "Same Month Last Year Revenue", 
+      "page": "Trend Analysis"
+    }
+  ],
+  "formatting": {
+    "theme": "Corporate",
+    "primaryColor": "#1f77b4",
+    "secondaryColor": "#ff7f0e", 
+    "fontFamily": "Segoe UI",
+    "fontSize": 12
+  }
+}
