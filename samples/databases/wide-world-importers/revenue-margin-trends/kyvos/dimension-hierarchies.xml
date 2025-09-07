@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DimensionHierarchies xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">
+  
+  <!-- Date Dimension Hierarchies -->
+  <Dimension ID="Date" Name="Date">
+    <Hierarchies>
+      
+      <!-- Calendar Hierarchy -->
+      <Hierarchy ID="Calendar" Name="Calendar Hierarchy">
+        <Description>Standard calendar year hierarchy for trend analysis</Description>
+        <Levels>
+          <Level ID="Calendar Year" Name="Year" Ordinal="0">
+            <SourceAttribute>Calendar Year</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>true</MemberNamesUnique>
+          </Level>
+          <Level ID="Calendar Quarter" Name="Quarter" Ordinal="1">
+            <SourceAttribute>Calendar Quarter</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>false</MemberNamesUnique>
+          </Level>
+          <Level ID="Calendar Month" Name="Month" Ordinal="2">
+            <SourceAttribute>Calendar Month</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>false</MemberNamesUnique>
+          </Level>
+          <Level ID="Date" Name="Date" Ordinal="3">
+            <SourceAttribute>Date</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>true</MemberNamesUnique>
+          </Level>
+        </Levels>
+      </Hierarchy>
+      
+      <!-- Fiscal Hierarchy -->
+      <Hierarchy ID="Fiscal" Name="Fiscal Hierarchy">
+        <Description>Fiscal year hierarchy for financial reporting</Description>
+        <Levels>
+          <Level ID="Fiscal Year" Name="Fiscal Year" Ordinal="0">
+            <SourceAttribute>Fiscal Year</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>true</MemberNamesUnique>
+          </Level>
+          <Level ID="Fiscal Quarter" Name="Fiscal Quarter" Ordinal="1">
+            <SourceAttribute>Fiscal Quarter</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>false</MemberNamesUnique>
+          </Level>
+          <Level ID="Fiscal Month" Name="Fiscal Month" Ordinal="2">
+            <SourceAttribute>Fiscal Month</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>false</MemberNamesUnique>
+          </Level>
+          <Level ID="Date" Name="Date" Ordinal="3">
+            <SourceAttribute>Date</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>true</MemberNamesUnique>
+          </Level>
+        </Levels>
+      </Hierarchy>
+      
+      <!-- Week Hierarchy -->
+      <Hierarchy ID="Weekly" Name="Weekly Hierarchy">
+        <Description>Weekly hierarchy for short-term trend analysis</Description>
+        <Levels>
+          <Level ID="Calendar Year" Name="Year" Ordinal="0">
+            <SourceAttribute>Calendar Year</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>true</MemberNamesUnique>
+          </Level>
+          <Level ID="Calendar Week" Name="Week" Ordinal="1">
+            <SourceAttribute>Calendar Week Label</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>false</MemberNamesUnique>
+          </Level>
+          <Level ID="Date" Name="Date" Ordinal="2">
+            <SourceAttribute>Date</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>true</MemberNamesUnique>
+          </Level>
+        </Levels>
+      </Hierarchy>
+      
+    </Hierarchies>
+  </Dimension>
+  
+  <!-- Customer Dimension Hierarchies -->
+  <Dimension ID="Customer" Name="Customer">
+    <Hierarchies>
+      
+      <!-- Geographic Hierarchy -->
+      <Hierarchy ID="Geographic" Name="Geographic Hierarchy">
+        <Description>Customer geographic hierarchy for regional analysis</Description>
+        <Levels>
+          <Level ID="Sales Territory" Name="Sales Territory" Ordinal="0">
+            <SourceAttribute>Sales Territory</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>true</MemberNamesUnique>
+          </Level>
+          <Level ID="State Province" Name="State/Province" Ordinal="1">
+            <SourceAttribute>State Province</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>false</MemberNamesUnique>
+          </Level>
+          <Level ID="City" Name="City" Ordinal="2">
+            <SourceAttribute>City</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>false</MemberNamesUnique>
+          </Level>
+          <Level ID="Customer" Name="Customer" Ordinal="3">
+            <SourceAttribute>Customer</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>true</MemberNamesUnique>
+          </Level>
+        </Levels>
+      </Hierarchy>
+      
+      <!-- Customer Category Hierarchy -->
+      <Hierarchy ID="Category" Name="Customer Category Hierarchy">
+        <Description>Customer segmentation hierarchy for business analysis</Description>
+        <Levels>
+          <Level ID="Customer Category" Name="Customer Category" Ordinal="0">
+            <SourceAttribute>Customer Category</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>true</MemberNamesUnique>
+          </Level>
+          <Level ID="Buying Group" Name="Buying Group" Ordinal="1">
+            <SourceAttribute>Buying Group</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>false</MemberNamesUnique>
+          </Level>
+          <Level ID="Customer" Name="Customer" Ordinal="2">
+            <SourceAttribute>Customer</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>true</MemberNamesUnique>
+          </Level>
+        </Levels>
+      </Hierarchy>
+      
+    </Hierarchies>
+  </Dimension>
+  
+  <!-- Stock Item Dimension Hierarchies -->
+  <Dimension ID="Stock Item" Name="Stock Item">
+    <Hierarchies>
+      
+      <!-- Product Hierarchy -->
+      <Hierarchy ID="Product" Name="Product Hierarchy">
+        <Description>Product categorization hierarchy for product analysis</Description>
+        <Levels>
+          <Level ID="Brand" Name="Brand" Ordinal="0">
+            <SourceAttribute>Brand</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>true</MemberNamesUnique>
+          </Level>
+          <Level ID="Color" Name="Color" Ordinal="1">
+            <SourceAttribute>Color</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>false</MemberNamesUnique>
+          </Level>
+          <Level ID="Size" Name="Size" Ordinal="2">
+            <SourceAttribute>Size</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>false</MemberNamesUnique>
+          </Level>
+          <Level ID="Stock Item" Name="Stock Item" Ordinal="3">
+            <SourceAttribute>Stock Item</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>true</MemberNamesUnique>
+          </Level>
+        </Levels>
+      </Hierarchy>
+      
+    </Hierarchies>
+  </Dimension>
+  
+  <!-- Employee Dimension Hierarchies -->
+  <Dimension ID="Employee" Name="Employee">
+    <Hierarchies>
+      
+      <!-- Organizational Hierarchy -->
+      <Hierarchy ID="Organization" Name="Organizational Hierarchy">
+        <Description>Employee organizational hierarchy for sales analysis</Description>
+        <Levels>
+          <Level ID="Is Salesperson" Name="Is Salesperson" Ordinal="0">
+            <SourceAttribute>Is Salesperson</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>true</MemberNamesUnique>
+          </Level>
+          <Level ID="Employee" Name="Employee" Ordinal="1">
+            <SourceAttribute>Employee</SourceAttribute>
+            <HideMemberIf>Never</HideMemberIf>
+            <MemberNamesUnique>true</MemberNamesUnique>
+          </Level>
+        </Levels>
+      </Hierarchy>
+      
+    </Hierarchies>
+  </Dimension>
+  
+</DimensionHierarchies>

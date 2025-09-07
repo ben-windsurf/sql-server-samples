@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CalculatedMeasures xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">
+  
+  <!-- Basic Calculated Measures -->
+  <CalculatedMember>
+    <Name>Margin Percentage</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>[Measures].[Profit] / [Measures].[Revenue Excluding Tax] * 100</Expression>
+    <FormatString>0.00%</FormatString>
+    <Visible>true</Visible>
+    <Description>Profit margin as percentage of revenue excluding tax</Description>
+  </CalculatedMember>
+  
+  <!-- Time Intelligence Measures -->
+  <CalculatedMember>
+    <Name>Revenue YoY Growth %</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      ([Measures].[Revenue Excluding Tax] - 
+       ([Measures].[Revenue Excluding Tax], ParallelPeriod([Date].[Calendar].[Year], 1))) /
+      ([Measures].[Revenue Excluding Tax], ParallelPeriod([Date].[Calendar].[Year], 1)) * 100
+    </Expression>
+    <FormatString>0.00%</FormatString>
+    <Visible>true</Visible>
+    <Description>Year-over-year revenue growth percentage</Description>
+  </CalculatedMember>
+  
+  <CalculatedMember>
+    <Name>Revenue MoM Growth %</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      ([Measures].[Revenue Excluding Tax] - 
+       ([Measures].[Revenue Excluding Tax], [Date].[Calendar].CurrentMember.PrevMember)) /
+      ([Measures].[Revenue Excluding Tax], [Date].[Calendar].CurrentMember.PrevMember) * 100
+    </Expression>
+    <FormatString>0.00%</FormatString>
+    <Visible>true</Visible>
+    <Description>Month-over-month revenue growth percentage</Description>
+  </CalculatedMember>
+  
+  <CalculatedMember>
+    <Name>Profit YoY Growth %</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      ([Measures].[Profit] - 
+       ([Measures].[Profit], ParallelPeriod([Date].[Calendar].[Year], 1))) /
+      ([Measures].[Profit], ParallelPeriod([Date].[Calendar].[Year], 1)) * 100
+    </Expression>
+    <FormatString>0.00%</FormatString>
+    <Visible>true</Visible>
+    <Description>Year-over-year profit growth percentage</Description>
+  </CalculatedMember>
+  
+  <!-- Rolling Period Measures -->
+  <CalculatedMember>
+    <Name>Rolling 12M Revenue</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      SUM(LastPeriods(12, [Date].[Calendar].[Month].CurrentMember), [Measures].[Revenue Excluding Tax])
+    </Expression>
+    <FormatString>Currency</FormatString>
+    <Visible>true</Visible>
+    <Description>Rolling 12-month revenue total</Description>
+  </CalculatedMember>
+  
+  <CalculatedMember>
+    <Name>Rolling 12M Profit</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      SUM(LastPeriods(12, [Date].[Calendar].[Month].CurrentMember), [Measures].[Profit])
+    </Expression>
+    <FormatString>Currency</FormatString>
+    <Visible>true</Visible>
+    <Description>Rolling 12-month profit total</Description>
+  </CalculatedMember>
+  
+  <CalculatedMember>
+    <Name>Rolling 12M Margin %</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      [Measures].[Rolling 12M Profit] / [Measures].[Rolling 12M Revenue] * 100
+    </Expression>
+    <FormatString>0.00%</FormatString>
+    <Visible>true</Visible>
+    <Description>Rolling 12-month profit margin percentage</Description>
+  </CalculatedMember>
+  
+  <CalculatedMember>
+    <Name>Rolling 6M Revenue</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      SUM(LastPeriods(6, [Date].[Calendar].[Month].CurrentMember), [Measures].[Revenue Excluding Tax])
+    </Expression>
+    <FormatString>Currency</FormatString>
+    <Visible>true</Visible>
+    <Description>Rolling 6-month revenue total</Description>
+  </CalculatedMember>
+  
+  <CalculatedMember>
+    <Name>Rolling 3M Revenue</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      SUM(LastPeriods(3, [Date].[Calendar].[Month].CurrentMember), [Measures].[Revenue Excluding Tax])
+    </Expression>
+    <FormatString>Currency</FormatString>
+    <Visible>true</Visible>
+    <Description>Rolling 3-month revenue total</Description>
+  </CalculatedMember>
+  
+  <!-- Moving Average Measures -->
+  <CalculatedMember>
+    <Name>3Month Avg Revenue</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      AVG(LastPeriods(3, [Date].[Calendar].[Month].CurrentMember), [Measures].[Revenue Excluding Tax])
+    </Expression>
+    <FormatString>Currency</FormatString>
+    <Visible>true</Visible>
+    <Description>3-month moving average revenue</Description>
+  </CalculatedMember>
+  
+  <CalculatedMember>
+    <Name>6Month Avg Revenue</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      AVG(LastPeriods(6, [Date].[Calendar].[Month].CurrentMember), [Measures].[Revenue Excluding Tax])
+    </Expression>
+    <FormatString>Currency</FormatString>
+    <Visible>true</Visible>
+    <Description>6-month moving average revenue</Description>
+  </CalculatedMember>
+  
+  <CalculatedMember>
+    <Name>12Month Avg Revenue</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      AVG(LastPeriods(12, [Date].[Calendar].[Month].CurrentMember), [Measures].[Revenue Excluding Tax])
+    </Expression>
+    <FormatString>Currency</FormatString>
+    <Visible>true</Visible>
+    <Description>12-month moving average revenue</Description>
+  </CalculatedMember>
+  
+  <!-- Previous Period Measures -->
+  <CalculatedMember>
+    <Name>Revenue Previous Month</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      ([Measures].[Revenue Excluding Tax], [Date].[Calendar].CurrentMember.PrevMember)
+    </Expression>
+    <FormatString>Currency</FormatString>
+    <Visible>true</Visible>
+    <Description>Revenue from previous month</Description>
+  </CalculatedMember>
+  
+  <CalculatedMember>
+    <Name>Revenue PY Same Month</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      ([Measures].[Revenue Excluding Tax], ParallelPeriod([Date].[Calendar].[Month], 12))
+    </Expression>
+    <FormatString>Currency</FormatString>
+    <Visible>true</Visible>
+    <Description>Revenue from same month previous year</Description>
+  </CalculatedMember>
+  
+  <CalculatedMember>
+    <Name>Profit Previous Month</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      ([Measures].[Profit], [Date].[Calendar].CurrentMember.PrevMember)
+    </Expression>
+    <FormatString>Currency</FormatString>
+    <Visible>true</Visible>
+    <Description>Profit from previous month</Description>
+  </CalculatedMember>
+  
+  <CalculatedMember>
+    <Name>Profit PY Same Month</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      ([Measures].[Profit], ParallelPeriod([Date].[Calendar].[Month], 12))
+    </Expression>
+    <FormatString>Currency</FormatString>
+    <Visible>true</Visible>
+    <Description>Profit from same month previous year</Description>
+  </CalculatedMember>
+  
+  <!-- Trend Indicator Measures -->
+  <CalculatedMember>
+    <Name>Revenue Trend</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      IIF([Measures].[Revenue MoM Growth %] > 0, "↗ Up", 
+          IIF([Measures].[Revenue MoM Growth %] < 0, "↘ Down", "→ Flat"))
+    </Expression>
+    <Visible>true</Visible>
+    <Description>Revenue trend direction indicator</Description>
+  </CalculatedMember>
+  
+  <CalculatedMember>
+    <Name>Margin Trend</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      IIF([Measures].[Margin Percentage] > 
+          ([Measures].[Profit], [Date].[Calendar].CurrentMember.PrevMember) / 
+          ([Measures].[Revenue Excluding Tax], [Date].[Calendar].CurrentMember.PrevMember) * 100,
+          "↗ Improving", 
+          IIF([Measures].[Margin Percentage] < 
+              ([Measures].[Profit], [Date].[Calendar].CurrentMember.PrevMember) / 
+              ([Measures].[Revenue Excluding Tax], [Date].[Calendar].CurrentMember.PrevMember) * 100,
+              "↘ Declining", "→ Stable"))
+    </Expression>
+    <Visible>true</Visible>
+    <Description>Margin trend direction indicator</Description>
+  </CalculatedMember>
+  
+  <!-- Performance Ratio Measures -->
+  <CalculatedMember>
+    <Name>Revenue per Customer</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      [Measures].[Revenue Excluding Tax] / [Measures].[Invoice Count]
+    </Expression>
+    <FormatString>Currency</FormatString>
+    <Visible>true</Visible>
+    <Description>Average revenue per customer transaction</Description>
+  </CalculatedMember>
+  
+  <CalculatedMember>
+    <Name>Profit per Unit</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      [Measures].[Profit] / [Measures].[Quantity]
+    </Expression>
+    <FormatString>Currency</FormatString>
+    <Visible>true</Visible>
+    <Description>Average profit per unit sold</Description>
+  </CalculatedMember>
+  
+  <CalculatedMember>
+    <Name>Revenue per Unit</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      [Measures].[Revenue Excluding Tax] / [Measures].[Quantity]
+    </Expression>
+    <FormatString>Currency</FormatString>
+    <Visible>true</Visible>
+    <Description>Average revenue per unit sold</Description>
+  </CalculatedMember>
+  
+  <!-- Seasonal Analysis Measures -->
+  <CalculatedMember>
+    <Name>Seasonal Index</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      [Measures].[Revenue Excluding Tax] / 
+      AVG([Date].[Calendar].[Month].Members, [Measures].[Revenue Excluding Tax])
+    </Expression>
+    <FormatString>0.00</FormatString>
+    <Visible>true</Visible>
+    <Description>Seasonal index for revenue (1.0 = average)</Description>
+  </CalculatedMember>
+  
+  <!-- Variance Measures -->
+  <CalculatedMember>
+    <Name>Revenue Variance from Average</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      [Measures].[Revenue Excluding Tax] - [Measures].[12Month Avg Revenue]
+    </Expression>
+    <FormatString>Currency</FormatString>
+    <Visible>true</Visible>
+    <Description>Revenue variance from 12-month average</Description>
+  </CalculatedMember>
+  
+  <CalculatedMember>
+    <Name>Profit Variance from Average</Name>
+    <ParentDimension>Measures</ParentDimension>
+    <Expression>
+      [Measures].[Profit] - 
+      AVG(LastPeriods(12, [Date].[Calendar].[Month].CurrentMember), [Measures].[Profit])
+    </Expression>
+    <FormatString>Currency</FormatString>
+    <Visible>true</Visible>
+    <Description>Profit variance from 12-month average</Description>
+  </CalculatedMember>
+  
+</CalculatedMeasures>

@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Cube xmlns="http://schemas.microsoft.com/analysisservices/2003/engine" 
+      xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <ID>WWI Revenue Margin Cube</ID>
+  <Name>WWI Revenue Margin Cube</Name>
+  <Description>Wide World Importers Revenue and Margin Analysis Cube for 12-month trend analysis</Description>
+  
+  <!-- Data Source Configuration -->
+  <DataSourceView>WWI_DW_DataSourceView</DataSourceView>
+  
+  <!-- Dimensions -->
+  <Dimensions>
+    <!-- Date Dimension -->
+    <Dimension>
+      <ID>Date</ID>
+      <Name>Date</Name>
+      <DimensionID>Date</DimensionID>
+      <Attributes>
+        <Attribute>
+          <ID>Date</ID>
+          <Name>Date</Name>
+          <Type>Regular</Type>
+          <KeyColumns>
+            <KeyColumn>
+              <DataType>DateTime</DataType>
+              <Source xsi:type="ColumnBinding">
+                <TableID>Dimension_Date</TableID>
+                <ColumnID>Date</ColumnID>
+              </Source>
+            </KeyColumn>
+          </KeyColumns>
+          <NameColumn>
+            <DataType>WChar</DataType>
+            <Source xsi:type="ColumnBinding">
+              <TableID>Dimension_Date</TableID>
+              <ColumnID>Calendar_Day_Label</ColumnID>
+            </Source>
+          </NameColumn>
+        </Attribute>
+        
+        <Attribute>
+          <ID>Calendar Year</ID>
+          <Name>Calendar Year</Name>
+          <KeyColumns>
+            <KeyColumn>
+              <DataType>Integer</DataType>
+              <Source xsi:type="ColumnBinding">
+                <TableID>Dimension_Date</TableID>
+                <ColumnID>Calendar_Year</ColumnID>
+              </Source>
+            </KeyColumn>
+          </KeyColumns>
+        </Attribute>
+        
+        <Attribute>
+          <ID>Calendar Quarter</ID>
+          <Name>Calendar Quarter</Name>
+          <KeyColumns>
+            <KeyColumn>
+              <DataType>WChar</DataType>
+              <Source xsi:type="ColumnBinding">
+                <TableID>Dimension_Date</TableID>
+                <ColumnID>Calendar_Quarter_Label</ColumnID>
+              </Source>
+            </KeyColumn>
+          </KeyColumns>
+        </Attribute>
+        
+        <Attribute>
+          <ID>Calendar Month</ID>
+          <Name>Calendar Month</Name>
+          <KeyColumns>
+            <KeyColumn>
+              <DataType>WChar</DataType>
+              <Source xsi:type="ColumnBinding">
+                <TableID>Dimension_Date</TableID>
+                <ColumnID>Calendar_Month_Label</ColumnID>
+              </Source>
+            </KeyColumn>
+          </KeyColumns>
+        </Attribute>
+        
+        <Attribute>
+          <ID>Fiscal Year</ID>
+          <Name>Fiscal Year</Name>
+          <KeyColumns>
+            <KeyColumn>
+              <DataType>Integer</DataType>
+              <Source xsi:type="ColumnBinding">
+                <TableID>Dimension_Date</TableID>
+                <ColumnID>Fiscal_Year</ColumnID>
+              </Source>
+            </KeyColumn>
+          </KeyColumns>
+        </Attribute>
+      </Attributes>
+      
+      <!-- Date Hierarchies -->
+      <Hierarchies>
+        <Hierarchy>
+          <ID>Calendar</ID>
+          <Name>Calendar</Name>
+          <Levels>
+            <Level>
+              <ID>Calendar Year</ID>
+              <Name>Calendar Year</Name>
+              <SourceAttributeID>Calendar Year</SourceAttributeID>
+            </Level>
+            <Level>
+              <ID>Calendar Quarter</ID>
+              <Name>Calendar Quarter</Name>
+              <SourceAttributeID>Calendar Quarter</SourceAttributeID>
+            </Level>
+            <Level>
+              <ID>Calendar Month</ID>
+              <Name>Calendar Month</Name>
+              <SourceAttributeID>Calendar Month</SourceAttributeID>
+            </Level>
+            <Level>
+              <ID>Date</ID>
+              <Name>Date</Name>
+              <SourceAttributeID>Date</SourceAttributeID>
+            </Level>
+          </Levels>
+        </Hierarchy>
+        
+        <Hierarchy>
+          <ID>Fiscal</ID>
+          <Name>Fiscal</Name>
+          <Levels>
+            <Level>
+              <ID>Fiscal Year</ID>
+              <Name>Fiscal Year</Name>
+              <SourceAttributeID>Fiscal Year</SourceAttributeID>
+            </Level>
+            <Level>
+              <ID>Calendar Month</ID>
+              <Name>Fiscal Month</Name>
+              <SourceAttributeID>Calendar Month</SourceAttributeID>
+            </Level>
+            <Level>
+              <ID>Date</ID>
+              <Name>Date</Name>
+              <SourceAttributeID>Date</SourceAttributeID>
+            </Level>
+          </Levels>
+        </Hierarchy>
+      </Hierarchies>
+    </Dimension>
+    
+    <!-- Customer Dimension -->
+    <Dimension>
+      <ID>Customer</ID>
+      <Name>Customer</Name>
+      <DimensionID>Customer</DimensionID>
+      <Attributes>
+        <Attribute>
+          <ID>Customer</ID>
+          <Name>Customer</Name>
+          <KeyColumns>
+            <KeyColumn>
+              <DataType>Integer</DataType>
+              <Source xsi:type="ColumnBinding">
+                <TableID>Dimension_Customer</TableID>
+                <ColumnID>Customer_Key</ColumnID>
+              </Source>
+            </KeyColumn>
+          </KeyColumns>
+          <NameColumn>
+            <DataType>WChar</DataType>
+            <Source xsi:type="ColumnBinding">
+              <TableID>Dimension_Customer</TableID>
+              <ColumnID>Customer</ColumnID>
+            </Source>
+          </NameColumn>
+        </Attribute>
+        
+        <Attribute>
+          <ID>Customer Category</ID>
+          <Name>Customer Category</Name>
+          <KeyColumns>
+            <KeyColumn>
+              <DataType>WChar</DataType>
+              <Source xsi:type="ColumnBinding">
+                <TableID>Dimension_Customer</TableID>
+                <ColumnID>Category</ColumnID>
+              </Source>
+            </KeyColumn>
+          </KeyColumns>
+        </Attribute>
+        
+        <Attribute>
+          <ID>Buying Group</ID>
+          <Name>Buying Group</Name>
+          <KeyColumns>
+            <KeyColumn>
+              <DataType>WChar</DataType>
+              <Source xsi:type="ColumnBinding">
+                <TableID>Dimension_Customer</TableID>
+                <ColumnID>Buying_Group</ColumnID>
+              </Source>
+            </KeyColumn>
+          </KeyColumns>
+        </Attribute>
+      </Attributes>
+      
+      <Hierarchies>
+        <Hierarchy>
+          <ID>Customer Hierarchy</ID>
+          <Name>Customer Hierarchy</Name>
+          <Levels>
+            <Level>
+              <ID>Customer Category</ID>
+              <Name>Customer Category</Name>
+              <SourceAttributeID>Customer Category</SourceAttributeID>
+            </Level>
+            <Level>
+              <ID>Buying Group</ID>
+              <Name>Buying Group</Name>
+              <SourceAttributeID>Buying Group</SourceAttributeID>
+            </Level>
+            <Level>
+              <ID>Customer</ID>
+              <Name>Customer</Name>
+              <SourceAttributeID>Customer</SourceAttributeID>
+            </Level>
+          </Levels>
+        </Hierarchy>
+      </Hierarchies>
+    </Dimension>
+    
+    <!-- Stock Item Dimension -->
+    <Dimension>
+      <ID>Stock Item</ID>
+      <Name>Stock Item</Name>
+      <DimensionID>Stock Item</DimensionID>
+      <Attributes>
+        <Attribute>
+          <ID>Stock Item</ID>
+          <Name>Stock Item</Name>
+          <KeyColumns>
+            <KeyColumn>
+              <DataType>Integer</DataType>
+              <Source xsi:type="ColumnBinding">
+                <TableID>Dimension_Stock_Item</TableID>
+                <ColumnID>Stock_Item_Key</ColumnID>
+              </Source>
+            </KeyColumn>
+          </KeyColumns>
+          <NameColumn>
+            <DataType>WChar</DataType>
+            <Source xsi:type="ColumnBinding">
+              <TableID>Dimension_Stock_Item</TableID>
+              <ColumnID>Stock_Item</ColumnID>
+            </Source>
+          </NameColumn>
+        </Attribute>
+        
+        <Attribute>
+          <ID>Brand</ID>
+          <Name>Brand</Name>
+          <KeyColumns>
+            <KeyColumn>
+              <DataType>WChar</DataType>
+              <Source xsi:type="ColumnBinding">
+                <TableID>Dimension_Stock_Item</TableID>
+                <ColumnID>Brand</ColumnID>
+              </Source>
+            </KeyColumn>
+          </KeyColumns>
+        </Attribute>
+        
+        <Attribute>
+          <ID>Color</ID>
+          <Name>Color</Name>
+          <KeyColumns>
+            <KeyColumn>
+              <DataType>WChar</DataType>
+              <Source xsi:type="ColumnBinding">
+                <TableID>Dimension_Stock_Item</TableID>
+                <ColumnID>Color</ColumnID>
+              </Source>
+            </KeyColumn>
+          </KeyColumns>
+        </Attribute>
+      </Attributes>
+    </Dimension>
+  </Dimensions>
+  
+  <!-- Measure Groups -->
+  <MeasureGroups>
+    <MeasureGroup>
+      <ID>Sale</ID>
+      <Name>Sale</Name>
+      <Source xsi:type="TableBinding">
+        <TableID>Fact_Sale</TableID>
+      </Source>
+      
+      <!-- Base Measures -->
+      <Measures>
+        <Measure>
+          <ID>Revenue Excluding Tax</ID>
+          <Name>Revenue Excluding Tax</Name>
+          <AggregateFunction>Sum</AggregateFunction>
+          <Source xsi:type="ColumnBinding">
+            <TableID>Fact_Sale</TableID>
+            <ColumnID>Total_Excluding_Tax</ColumnID>
+          </Source>
+          <FormatString>Currency</FormatString>
+        </Measure>
+        
+        <Measure>
+          <ID>Revenue Including Tax</ID>
+          <Name>Revenue Including Tax</Name>
+          <AggregateFunction>Sum</AggregateFunction>
+          <Source xsi:type="ColumnBinding">
+            <TableID>Fact_Sale</TableID>
+            <ColumnID>Total_Including_Tax</ColumnID>
+          </Source>
+          <FormatString>Currency</FormatString>
+        </Measure>
+        
+        <Measure>
+          <ID>Profit</ID>
+          <Name>Profit</Name>
+          <AggregateFunction>Sum</AggregateFunction>
+          <Source xsi:type="ColumnBinding">
+            <TableID>Fact_Sale</TableID>
+            <ColumnID>Profit</ColumnID>
+          </Source>
+          <FormatString>Currency</FormatString>
+        </Measure>
+        
+        <Measure>
+          <ID>Quantity</ID>
+          <Name>Quantity</Name>
+          <AggregateFunction>Sum</AggregateFunction>
+          <Source xsi:type="ColumnBinding">
+            <TableID>Fact_Sale</TableID>
+            <ColumnID>Quantity</ColumnID>
+          </Source>
+          <FormatString>Standard</FormatString>
+        </Measure>
+        
+        <Measure>
+          <ID>Invoice Count</ID>
+          <Name>Invoice Count</Name>
+          <AggregateFunction>DistinctCount</AggregateFunction>
+          <Source xsi:type="ColumnBinding">
+            <TableID>Fact_Sale</TableID>
+            <ColumnID>WWI_Invoice_ID</ColumnID>
+          </Source>
+          <FormatString>Standard</FormatString>
+        </Measure>
+      </Measures>
+      
+      <!-- Dimension Relationships -->
+      <Dimensions>
+        <Dimension xsi:type="RegularMeasureGroupDimension">
+          <CubeDimensionID>Date</CubeDimensionID>
+          <Attributes>
+            <Attribute>
+              <AttributeID>Date</AttributeID>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>DateTime</DataType>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>Fact_Sale</TableID>
+                    <ColumnID>Invoice_Date_Key</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+            </Attribute>
+          </Attributes>
+        </Dimension>
+        
+        <Dimension xsi:type="RegularMeasureGroupDimension">
+          <CubeDimensionID>Customer</CubeDimensionID>
+          <Attributes>
+            <Attribute>
+              <AttributeID>Customer</AttributeID>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>Integer</DataType>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>Fact_Sale</TableID>
+                    <ColumnID>Customer_Key</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+            </Attribute>
+          </Attributes>
+        </Dimension>
+        
+        <Dimension xsi:type="RegularMeasureGroupDimension">
+          <CubeDimensionID>Stock Item</CubeDimensionID>
+          <Attributes>
+            <Attribute>
+              <AttributeID>Stock Item</AttributeID>
+              <KeyColumns>
+                <KeyColumn>
+                  <DataType>Integer</DataType>
+                  <Source xsi:type="ColumnBinding">
+                    <TableID>Fact_Sale</TableID>
+                    <ColumnID>Stock_Item_Key</ColumnID>
+                  </Source>
+                </KeyColumn>
+              </KeyColumns>
+            </Attribute>
+          </Attributes>
+        </Dimension>
+      </Dimensions>
+    </MeasureGroup>
+  </MeasureGroups>
+  
+  <!-- MDX Script with Calculated Measures -->
+  <MdxScripts>
+    <MdxScript>
+      <ID>MdxScript</ID>
+      <Name>MdxScript</Name>
+      <Commands>
+        <Command>
+          <Text>
+            CALCULATE;
+            
+            /* Margin Percentage Calculation */
+            CREATE MEMBER CURRENTCUBE.[Measures].[Margin Percentage]
+            AS [Measures].[Profit] / [Measures].[Revenue Excluding Tax] * 100,
+            FORMAT_STRING = "0.00%",
+            VISIBLE = 1;
+            
+            /* Year-over-Year Revenue Growth */
+            CREATE MEMBER CURRENTCUBE.[Measures].[Revenue YoY Growth %]
+            AS ([Measures].[Revenue Excluding Tax] - 
+                ([Measures].[Revenue Excluding Tax], ParallelPeriod([Date].[Calendar].[Year], 1))) /
+               ([Measures].[Revenue Excluding Tax], ParallelPeriod([Date].[Calendar].[Year], 1)) * 100,
+            FORMAT_STRING = "0.00%",
+            VISIBLE = 1;
+            
+            /* Month-over-Month Revenue Growth */
+            CREATE MEMBER CURRENTCUBE.[Measures].[Revenue MoM Growth %]
+            AS ([Measures].[Revenue Excluding Tax] - 
+                ([Measures].[Revenue Excluding Tax], [Date].[Calendar].CurrentMember.PrevMember)) /
+               ([Measures].[Revenue Excluding Tax], [Date].[Calendar].CurrentMember.PrevMember) * 100,
+            FORMAT_STRING = "0.00%",
+            VISIBLE = 1;
+            
+            /* Rolling 12-Month Revenue */
+            CREATE MEMBER CURRENTCUBE.[Measures].[Rolling 12M Revenue]
+            AS SUM(LastPeriods(12, [Date].[Calendar].[Month].CurrentMember), [Measures].[Revenue Excluding Tax]),
+            FORMAT_STRING = "Currency",
+            VISIBLE = 1;
+            
+            /* Rolling 12-Month Profit */
+            CREATE MEMBER CURRENTCUBE.[Measures].[Rolling 12M Profit]
+            AS SUM(LastPeriods(12, [Date].[Calendar].[Month].CurrentMember), [Measures].[Profit]),
+            FORMAT_STRING = "Currency",
+            VISIBLE = 1;
+            
+            /* Rolling 12-Month Margin Percentage */
+            CREATE MEMBER CURRENTCUBE.[Measures].[Rolling 12M Margin %]
+            AS [Measures].[Rolling 12M Profit] / [Measures].[Rolling 12M Revenue] * 100,
+            FORMAT_STRING = "0.00%",
+            VISIBLE = 1;
+            
+            /* Revenue Trend Indicator */
+            CREATE MEMBER CURRENTCUBE.[Measures].[Revenue Trend]
+            AS IIF([Measures].[Revenue MoM Growth %] > 0, "↗ Up", 
+                   IIF([Measures].[Revenue MoM Growth %] < 0, "↘ Down", "→ Flat")),
+            VISIBLE = 1;
+            
+            /* Previous Year Same Month Revenue */
+            CREATE MEMBER CURRENTCUBE.[Measures].[Revenue PY Same Month]
+            AS ([Measures].[Revenue Excluding Tax], ParallelPeriod([Date].[Calendar].[Month], 12)),
+            FORMAT_STRING = "Currency",
+            VISIBLE = 1;
+            
+            /* Previous Month Revenue */
+            CREATE MEMBER CURRENTCUBE.[Measures].[Revenue Previous Month]
+            AS ([Measures].[Revenue Excluding Tax], [Date].[Calendar].CurrentMember.PrevMember),
+            FORMAT_STRING = "Currency",
+            VISIBLE = 1;
+            
+            /* 3-Month Moving Average Revenue */
+            CREATE MEMBER CURRENTCUBE.[Measures].[3Month Avg Revenue]
+            AS AVG(LastPeriods(3, [Date].[Calendar].[Month].CurrentMember), [Measures].[Revenue Excluding Tax]),
+            FORMAT_STRING = "Currency",
+            VISIBLE = 1;
+            
+            /* Revenue per Customer */
+            CREATE MEMBER CURRENTCUBE.[Measures].[Revenue per Customer]
+            AS [Measures].[Revenue Excluding Tax] / [Measures].[Invoice Count],
+            FORMAT_STRING = "Currency",
+            VISIBLE = 1;
+          </Text>
+        </Command>
+      </Commands>
+    </MdxScript>
+  </MdxScripts>
+</Cube>

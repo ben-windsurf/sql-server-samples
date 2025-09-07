@@ -1,0 +1,60 @@
+{
+  "parameters": {
+    "development": {
+      "ServerName": "localhost\\SQLEXPRESS",
+      "DatabaseName": "WideWorldImportersDW",
+      "StartDate": "2015-01-01",
+      "EndDate": "2016-12-31",
+      "FiscalYearStart": 7,
+      "RefreshMode": "Import"
+    },
+    "testing": {
+      "ServerName": "test-sql-server.database.windows.net",
+      "DatabaseName": "WideWorldImportersDW",
+      "StartDate": "2016-01-01", 
+      "EndDate": "2016-12-31",
+      "FiscalYearStart": 7,
+      "RefreshMode": "DirectQuery"
+    },
+    "production": {
+      "ServerName": "prod-sql-server.database.windows.net",
+      "DatabaseName": "WideWorldImportersDW", 
+      "StartDate": "2015-01-01",
+      "EndDate": "2017-12-31",
+      "FiscalYearStart": 7,
+      "RefreshMode": "Import"
+    }
+  },
+  "visualizationSettings": {
+    "dateFormat": "MMM yyyy",
+    "currencyFormat": "$#,##0",
+    "percentageFormat": "0.00%",
+    "numberFormat": "#,##0",
+    "colorPalette": {
+      "revenue": "#1f77b4",
+      "profit": "#ff7f0e", 
+      "growth": "#2ca02c",
+      "decline": "#d62728",
+      "neutral": "#7f7f7f"
+    },
+    "chartDefaults": {
+      "showDataLabels": true,
+      "showLegend": true,
+      "showGridlines": true,
+      "animationEnabled": true
+    }
+  },
+  "filterDefaults": {
+    "dateRange": "Last 12 Months",
+    "customerSegment": "All",
+    "productCategory": "All",
+    "salesTerritory": "All"
+  },
+  "refreshSchedule": {
+    "frequency": "Daily",
+    "time": "06:00",
+    "timezone": "UTC",
+    "incrementalRefresh": true,
+    "incrementalWindow": "30 days"
+  }
+}
