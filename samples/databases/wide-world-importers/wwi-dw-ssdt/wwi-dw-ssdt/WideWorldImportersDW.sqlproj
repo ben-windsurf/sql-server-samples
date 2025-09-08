@@ -80,6 +80,9 @@
     <Folder Include="Security\" />
     <Folder Include="Sequences\Sequences\" />
     <Folder Include="PostDeploymentScripts" />
+    <Folder Include="Reports\" />
+    <Folder Include="Reports\Views\" />
+    <Folder Include="Reports\Stored Procedures\" />
     <Folder Include="dbo" />
     <Folder Include="dbo\Tables" />
   </ItemGroup>
@@ -155,6 +158,12 @@
     <Build Include="Sequences\Sequences\StockItemKey.sql" />
     <Build Include="Sequences\Sequences\SupplierKey.sql" />
     <Build Include="Sequences\Sequences\TransactionTypeKey.sql" />
+    <Build Include="Reports\Views\MonthlyRevenueTrends.sql" />
+    <Build Include="Reports\Views\MonthlyMarginTrends.sql" />
+    <Build Include="Reports\Views\ComprehensiveTrends.sql" />
+    <Build Include="Reports\Views\QuarterlyTrends.sql" />
+    <Build Include="Reports\Views\WeeklyTrends.sql" />
+    <Build Include="Reports\Stored Procedures\GetRevenueTrendsByDateRange.sql" />
     <Build Include="dbo\Tables\SampleVersion.sql" />
   </ItemGroup>
   <ItemGroup>
