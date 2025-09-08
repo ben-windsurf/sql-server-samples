@@ -179,38 +179,66 @@ def generate_denormalized_sales_data(
     stock_item_df: pd.DataFrame,
     city_df: pd.DataFrame,
     employee_df: pd.DataFrame,
-    num_sales: int = 50000
+    num_sales: int = 1000
 ) -> pd.DataFrame:
-    """Generate sales fact table data with realistic patterns"""
+    """Generate exactly num_sales records distributed realistically across 12 months"""
+    print(f"Generating {num_sales} denormalized sales records with seasonal patterns...")
+    
+    seasonal_multipliers = {
+        1: 0.7,   # January - post-holiday low
+        2: 0.8,   # February - low
+        3: 0.9,   # March - spring pickup
+        4: 1.0,   # April - normal
+        5: 1.1,   # May - spring high
+        6: 1.0,   # June - normal
+        7: 0.8,   # July - summer low
+        8: 0.8,   # August - summer low
+        9: 1.0,   # September - back to school
+        10: 1.1,  # October - pre-holiday
+        11: 1.4,  # November - Black Friday
+        12: 1.5   # December - Christmas
+    }
+    
+    total_weight = sum(seasonal_multipliers.values())
+    records_per_month = {}
+    remaining_records = num_sales
+    
+    for month in range(1, 13):
+        if month == 12:  # Last month gets remaining records
+            records_per_month[month] = remaining_records
+        else:
+            month_records = int((seasonal_multipliers[month] / total_weight) * num_sales)
+            records_per_month[month] = max(1, month_records)  # Ensure at least 1 record per month
+            remaining_records -= records_per_month[month]
+    
+    print(f"Records per month: {records_per_month}")
     
     sales_data = []
     sale_key = 1
     
-    for _, date_row in date_df.iterrows():
-        date_obj = datetime.strptime(date_row['date'], '%Y-%m-%d')
+    for month in range(1, 13):
+        month_records = records_per_month[month]
         
-        month = date_obj.month
-        if month in [11, 12]:  # Holiday season
-            seasonal_factor = 1.4
-        elif month in [1, 2]:  # Post-holiday slump
-            seasonal_factor = 0.7
-        elif month in [6, 7, 8]:  # Summer
-            seasonal_factor = 1.1
-        else:
-            seasonal_factor = 1.0
+        month_dates = date_df[date_df['calendar_month_number'] == month]
         
-        weekend_factor = 0.6 if date_row['is_weekend'] else 1.0
+        if len(month_dates) == 0:
+            print(f"Warning: No dates found for month {month}")
+            continue
         
-        base_daily_sales = 50
-        daily_sales = int(base_daily_sales * seasonal_factor * weekend_factor * random.uniform(0.5, 1.5))
-        
-        for _ in range(daily_sales):
+        for i in range(month_records):
+            date_row = month_dates.sample(1).iloc[0]
+            date_obj = datetime.strptime(date_row['date'], '%Y-%m-%d')
+            
+            # Random selections from other dimensions
             customer = customer_df.sample(1).iloc[0]
             stock_item = stock_item_df.sample(1).iloc[0]
             city = city_df.sample(1).iloc[0]
             employee = employee_df.sample(1).iloc[0]
             
-            quantity = random.randint(1, 20)
+            base_quantity = random.randint(1, 20)
+            seasonal_factor = seasonal_multipliers[month]
+            quantity = max(1, int(base_quantity * seasonal_factor))
+            
             unit_price = stock_item['unit_price'] * random.uniform(0.8, 1.2)  # Price variation
             
             total_excluding_tax = round(quantity * unit_price, 2)
@@ -289,14 +317,16 @@ def generate_denormalized_sales_data(
             })
             
             sale_key += 1
-            
-            if len(sales_data) >= num_sales:
-                break
-        
-        if len(sales_data) >= num_sales:
-            break
     
-    return pd.DataFrame(sales_data)
+    df = pd.DataFrame(sales_data)
+    print(f"Generated {len(df)} sales records across {df['calendar_month_number'].nunique()} months")
+    
+    monthly_counts = df.groupby(['calendar_month_number', 'calendar_month_label']).size().reset_index(name='count')
+    print("\nMonthly distribution:")
+    for _, row in monthly_counts.iterrows():
+        print(f"  {row['calendar_month_label']}: {row['count']} records")
+    
+    return df
 
 def create_denormalized_table_schema() -> str:
     """Return SQL DDL statement for creating denormalized wide-world-importers table"""
@@ -393,8 +423,8 @@ def main():
     print("Generating 12 months of WideWorldImportersDW sample data...")
     print("=" * 60)
     
-    end_date = datetime.now().replace(day=1) - timedelta(days=1)  # Last day of previous month
-    start_date = end_date.replace(day=1) - timedelta(days=365)    # 12 months ago
+    start_date = datetime(2024, 1, 1)
+    end_date = datetime(2024, 12, 31)
     
     print(f"Date range: {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}")
     
