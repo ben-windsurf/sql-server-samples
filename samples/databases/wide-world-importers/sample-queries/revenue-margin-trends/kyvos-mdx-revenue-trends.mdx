@@ -1,0 +1,191 @@
+/*
+=============================================
+MDX Queries for Kyvos Integration
+SSAS Cube: Wide World Importers
+Database: WideWorldImportersDW
+=============================================
+*/
+
+-- =============================================
+-- 12-Month Revenue and Margin Trends
+-- =============================================
+
+SELECT 
+    NON EMPTY {
+        [Measures].[Sales Total Including Tax],
+        [Measures].[Sales Total Excluding Tax], 
+        [Measures].[Sales Profit],
+        [Measures].[Sales Count]
+    } ON COLUMNS,
+    
+    NON EMPTY 
+        [Invoice Date].[Calendar].[Month].MEMBERS ON ROWS
+
+FROM [Wide World Importers]
+
+WHERE (
+    [Invoice Date].[Calendar].CURRENTMEMBER.LAG(11) : 
+    [Invoice Date].[Calendar].CURRENTMEMBER
+);
+
+-- =============================================
+-- Year-to-Date vs Previous Year-to-Date
+-- =============================================
+
+SELECT 
+    NON EMPTY {
+        [Measures].[Sales Total Including Tax Invoice YTD],
+        [Measures].[Sales Total Excluding Tax Invoice YTD],
+        [Measures].[Sales Total Including Tax Previous Invoice YTD],
+        [Measures].[Sales Total Excluding Tax Previous Invoice YTD]
+    } ON COLUMNS,
+    
+    NON EMPTY 
+        [Invoice Date].[Calendar].[Month].MEMBERS ON ROWS
+
+FROM [Wide World Importers]
+
+WHERE (
+    [Invoice Date].[Calendar].CURRENTMEMBER.LAG(11) : 
+    [Invoice Date].[Calendar].CURRENTMEMBER
+);
+
+-- =============================================
+-- Quarterly Revenue and Margin Analysis
+-- =============================================
+
+SELECT 
+    NON EMPTY {
+        [Measures].[Sales Total Including Tax],
+        [Measures].[Sales Total Excluding Tax],
+        [Measures].[Sales Profit],
+        [Measures].[Sales Count]
+    } ON COLUMNS,
+    
+    NON EMPTY 
+        [Invoice Date].[Calendar].[Quarter].MEMBERS ON ROWS
+
+FROM [Wide World Importers]
+
+WHERE (
+    [Invoice Date].[Calendar].CURRENTMEMBER.LAG(3) : 
+    [Invoice Date].[Calendar].CURRENTMEMBER
+);
+
+-- =============================================
+-- Custom Calculated Members for Enhanced Analysis
+-- =============================================
+
+WITH 
+    MEMBER [Measures].[Margin Percentage] AS 
+        IIF(
+            [Measures].[Sales Total Excluding Tax] = 0,
+            NULL,
+            ([Measures].[Sales Profit] / [Measures].[Sales Total Excluding Tax]) * 100
+        ),
+        FORMAT_STRING = "0.00%"
+    
+    MEMBER [Measures].[Revenue Growth] AS
+        IIF(
+            ([Invoice Date].[Calendar].CURRENTMEMBER.PREVMEMBER, [Measures].[Sales Total Including Tax]) = 0,
+            NULL,
+            (([Measures].[Sales Total Including Tax] - 
+              ([Invoice Date].[Calendar].CURRENTMEMBER.PREVMEMBER, [Measures].[Sales Total Including Tax])) /
+             ([Invoice Date].[Calendar].CURRENTMEMBER.PREVMEMBER, [Measures].[Sales Total Including Tax])) * 100
+        ),
+        FORMAT_STRING = "0.00%"
+    
+    MEMBER [Measures].[Average Transaction Value] AS
+        IIF(
+            [Measures].[Sales Count] = 0,
+            NULL,
+            [Measures].[Sales Total Including Tax] / [Measures].[Sales Count]
+        ),
+        FORMAT_STRING = "$#,##0.00"
+
+SELECT 
+    NON EMPTY {
+        [Measures].[Sales Total Including Tax],
+        [Measures].[Sales Total Excluding Tax],
+        [Measures].[Sales Profit],
+        [Measures].[Margin Percentage],
+        [Measures].[Revenue Growth],
+        [Measures].[Average Transaction Value],
+        [Measures].[Sales Count]
+    } ON COLUMNS,
+    
+    NON EMPTY 
+        [Invoice Date].[Calendar].[Month].MEMBERS ON ROWS
+
+FROM [Wide World Importers]
+
+WHERE (
+    [Invoice Date].[Calendar].CURRENTMEMBER.LAG(11) : 
+    [Invoice Date].[Calendar].CURRENTMEMBER
+);
+
+-- =============================================
+-- Top Performing Periods Analysis
+-- =============================================
+
+SELECT 
+    NON EMPTY {
+        [Measures].[Sales Total Including Tax],
+        [Measures].[Sales Profit]
+    } ON COLUMNS,
+    
+    NON EMPTY 
+        TOPCOUNT(
+            [Invoice Date].[Calendar].[Month].MEMBERS,
+            12,
+            [Measures].[Sales Total Including Tax]
+        ) ON ROWS
+
+FROM [Wide World Importers];
+
+-- =============================================
+-- City-wise Revenue Trends (12 Months)
+-- =============================================
+
+SELECT 
+    NON EMPTY {
+        [Measures].[Sales Total Including Tax],
+        [Measures].[Sales Profit]
+    } ON COLUMNS,
+    
+    NON EMPTY 
+        CROSSJOIN(
+            [Invoice Date].[Calendar].[Month].MEMBERS,
+            TOPCOUNT([City].[City Hierarchy].[City].MEMBERS, 10, [Measures].[Sales Total Including Tax])
+        ) ON ROWS
+
+FROM [Wide World Importers]
+
+WHERE (
+    [Invoice Date].[Calendar].CURRENTMEMBER.LAG(11) : 
+    [Invoice Date].[Calendar].CURRENTMEMBER
+);
+
+-- =============================================
+-- Stock Item Category Revenue Analysis
+-- =============================================
+
+SELECT 
+    NON EMPTY {
+        [Measures].[Sales Total Including Tax],
+        [Measures].[Sales Total Excluding Tax],
+        [Measures].[Sales Profit]
+    } ON COLUMNS,
+    
+    NON EMPTY 
+        CROSSJOIN(
+            [Invoice Date].[Calendar].[Quarter].MEMBERS,
+            [Stock Item].[Stock Item Hierarchy].[Category].MEMBERS
+        ) ON ROWS
+
+FROM [Wide World Importers]
+
+WHERE (
+    [Invoice Date].[Calendar].CURRENTMEMBER.LAG(3) : 
+    [Invoice Date].[Calendar].CURRENTMEMBER
+);
