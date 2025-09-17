@@ -1,0 +1,221 @@
+-- =============================================
+-- Kyvos-Compatible MDX Query Examples
+-- WideWorldImporters SSAS Multidimensional Cube
+-- Leverages existing cube measures and dimensions
+-- =============================================
+
+-- Query 1: 12-Month Revenue Trend with Year-over-Year Comparison
+-- Uses existing Sales Total Excluding Tax measures from the cube
+SELECT 
+    {[Measures].[Sales Total Excluding Tax],
+     [Measures].[Sales Total Excluding Tax Previous Invoice YTD],
+     [Measures].[Sales Total Including Tax],
+     [Measures].[Sales Total Including Tax Previous Invoice YTD]} ON COLUMNS,
+    
+    {[Invoice Date].[Calendar].[Month].MEMBERS} ON ROWS
+
+FROM [Wide World Importers]
+
+WHERE ([Invoice Date].[Calendar].[Year].&[2016] : [Invoice Date].[Calendar].[Year].&[2017]);
+
+-- Query 2: Monthly Margin Analysis with Profit Calculations
+-- Combines revenue and profit measures to calculate margin percentages
+WITH 
+MEMBER [Measures].[Margin Percentage] AS 
+    IIF([Measures].[Sales Total Excluding Tax] = 0, 
+        NULL, 
+        ([Measures].[Sales Profit] / [Measures].[Sales Total Excluding Tax]) * 100)
+
+MEMBER [Measures].[Previous Year Margin] AS 
+    IIF([Measures].[Sales Total Excluding Tax Previous Invoice YTD] = 0, 
+        NULL, 
+        ([Measures].[Sales Profit Previous Invoice YTD] / [Measures].[Sales Total Excluding Tax Previous Invoice YTD]) * 100)
+
+SELECT 
+    {[Measures].[Sales Total Excluding Tax],
+     [Measures].[Sales Profit],
+     [Measures].[Margin Percentage],
+     [Measures].[Previous Year Margin]} ON COLUMNS,
+    
+    [Invoice Date].[Calendar].[Month].MEMBERS ON ROWS
+
+FROM [Wide World Importers]
+
+WHERE [Invoice Date].[Calendar].[Year].&[2016];
+
+-- Query 3: Revenue Trends by Customer Category
+-- Analyzes revenue patterns across different customer segments
+SELECT 
+    {[Measures].[Sales Total Excluding Tax],
+     [Measures].[Sales Total Including Tax],
+     [Measures].[Sales Quantity]} ON COLUMNS,
+    
+    NON EMPTY 
+    [Customer].[Customer Category].[Customer Category].MEMBERS * 
+    [Invoice Date].[Calendar].[Month].MEMBERS ON ROWS
+
+FROM [Wide World Importers]
+
+WHERE [Invoice Date].[Calendar].[Year].&[2016];
+
+-- Query 4: Top Performing Months with Growth Calculations
+-- Identifies best performing months and calculates growth rates
+WITH 
+MEMBER [Measures].[Month Over Month Growth] AS 
+    IIF([Invoice Date].[Calendar].CurrentMember.PrevMember IS NULL,
+        NULL,
+        (([Measures].[Sales Total Excluding Tax] - 
+          ([Measures].[Sales Total Excluding Tax], [Invoice Date].[Calendar].CurrentMember.PrevMember)) /
+         ([Measures].[Sales Total Excluding Tax], [Invoice Date].[Calendar].CurrentMember.PrevMember)) * 100)
+
+SELECT 
+    {[Measures].[Sales Total Excluding Tax],
+     [Measures].[Month Over Month Growth]} ON COLUMNS,
+    
+    ORDER(
+        [Invoice Date].[Calendar].[Month].MEMBERS,
+        [Measures].[Sales Total Excluding Tax],
+        BDESC
+    ) ON ROWS
+
+FROM [Wide World Importers]
+
+WHERE [Invoice Date].[Calendar].[Year].&[2016];
+
+-- Query 5: Quarterly Revenue and Margin Summary
+-- Provides quarterly aggregations for executive reporting
+WITH 
+MEMBER [Measures].[Quarterly Margin] AS 
+    IIF([Measures].[Sales Total Excluding Tax] = 0, 
+        NULL, 
+        ([Measures].[Sales Profit] / [Measures].[Sales Total Excluding Tax]) * 100)
+
+MEMBER [Measures].[Quarter Over Quarter Growth] AS 
+    IIF([Invoice Date].[Calendar].CurrentMember.PrevMember IS NULL,
+        NULL,
+        (([Measures].[Sales Total Excluding Tax] - 
+          ([Measures].[Sales Total Excluding Tax], [Invoice Date].[Calendar].CurrentMember.PrevMember)) /
+         ([Measures].[Sales Total Excluding Tax], [Invoice Date].[Calendar].CurrentMember.PrevMember)) * 100)
+
+SELECT 
+    {[Measures].[Sales Total Excluding Tax],
+     [Measures].[Sales Total Including Tax],
+     [Measures].[Sales Profit],
+     [Measures].[Quarterly Margin],
+     [Measures].[Quarter Over Quarter Growth]} ON COLUMNS,
+    
+    [Invoice Date].[Calendar].[Quarter].MEMBERS ON ROWS
+
+FROM [Wide World Importers]
+
+WHERE [Invoice Date].[Calendar].[Year].&[2016];
+
+-- Query 6: Revenue Distribution by Stock Item Categories
+-- Analyzes which product categories drive the most revenue
+SELECT 
+    {[Measures].[Sales Total Excluding Tax],
+     [Measures].[Sales Quantity],
+     [Measures].[Sales Profit]} ON COLUMNS,
+    
+    NON EMPTY 
+    [Stock Item].[Stock Item Category].[Stock Item Category].MEMBERS ON ROWS
+
+FROM [Wide World Importers]
+
+WHERE [Invoice Date].[Calendar].[Year].&[2016];
+
+-- Query 7: Geographic Revenue Analysis
+-- Shows revenue distribution across different cities/regions
+SELECT 
+    {[Measures].[Sales Total Excluding Tax],
+     [Measures].[Sales Total Including Tax]} ON COLUMNS,
+    
+    NON EMPTY 
+    [City].[State Province].[State Province].MEMBERS * 
+    [City].[City].[City].MEMBERS ON ROWS
+
+FROM [Wide World Importers]
+
+WHERE [Invoice Date].[Calendar].[Year].&[2016];
+
+-- Query 8: Salesperson Performance with Revenue and Margin
+-- Evaluates individual salesperson contribution to revenue and profitability
+WITH 
+MEMBER [Measures].[Salesperson Margin] AS 
+    IIF([Measures].[Sales Total Excluding Tax] = 0, 
+        NULL, 
+        ([Measures].[Sales Profit] / [Measures].[Sales Total Excluding Tax]) * 100)
+
+SELECT 
+    {[Measures].[Sales Total Excluding Tax],
+     [Measures].[Sales Profit],
+     [Measures].[Salesperson Margin],
+     [Measures].[Sales Quantity]} ON COLUMNS,
+    
+    NON EMPTY 
+    [Salesperson].[Salesperson].[Salesperson].MEMBERS ON ROWS
+
+FROM [Wide World Importers]
+
+WHERE [Invoice Date].[Calendar].[Year].&[2016];
+
+-- Query 9: Time Intelligence - Rolling 12 Month Analysis
+-- Provides rolling 12-month revenue trends for any selected period
+WITH 
+SET [Last12Months] AS 
+    [Invoice Date].[Calendar].CurrentMember.Lag(11) : [Invoice Date].[Calendar].CurrentMember
+
+MEMBER [Measures].[Rolling 12 Month Revenue] AS 
+    SUM([Last12Months], [Measures].[Sales Total Excluding Tax])
+
+MEMBER [Measures].[Rolling 12 Month Profit] AS 
+    SUM([Last12Months], [Measures].[Sales Profit])
+
+SELECT 
+    {[Measures].[Sales Total Excluding Tax],
+     [Measures].[Rolling 12 Month Revenue],
+     [Measures].[Rolling 12 Month Profit]} ON COLUMNS,
+    
+    [Invoice Date].[Calendar].[Month].MEMBERS ON ROWS
+
+FROM [Wide World Importers]
+
+WHERE [Invoice Date].[Calendar].[Year].&[2016];
+
+-- Query 10: KPI-Style Revenue Performance Indicators
+-- Creates performance indicators suitable for executive dashboards
+WITH 
+MEMBER [Measures].[Revenue Target] AS 1000000 -- Example target
+
+MEMBER [Measures].[Revenue Achievement %] AS 
+    ([Measures].[Sales Total Excluding Tax] / [Measures].[Revenue Target]) * 100
+
+MEMBER [Measures].[Performance Status] AS 
+    IIF([Measures].[Revenue Achievement %] >= 100, 
+        "Target Met", 
+        IIF([Measures].[Revenue Achievement %] >= 90, 
+            "Close to Target", 
+            "Below Target"))
+
+SELECT 
+    {[Measures].[Sales Total Excluding Tax],
+     [Measures].[Revenue Target],
+     [Measures].[Revenue Achievement %],
+     [Measures].[Performance Status]} ON COLUMNS,
+    
+    [Invoice Date].[Calendar].[Month].MEMBERS ON ROWS
+
+FROM [Wide World Importers]
+
+WHERE [Invoice Date].[Calendar].[Year].&[2016];
+
+-- =============================================
+-- Kyvos Optimization Notes:
+-- 
+-- 1. These queries leverage existing cube measures for optimal performance
+-- 2. Use NON EMPTY to reduce result set size and improve query speed
+-- 3. ORDER functions help identify top performers efficiently
+-- 4. WITH clauses create reusable calculated members
+-- 5. Time intelligence functions provide powerful trend analysis
+-- 6. Consider creating cube-level calculated members for frequently used calculations
+-- =============================================
