@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WideWorldImporters - Revenue & Margin Trends</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>WideWorldImporters Data Warehouse</h1>
+            <h2>12-Month Revenue & Margin Trends Analysis</h2>
+            <p class="subtitle">Compatible with PowerBI and Kyvos • Data sourced from WideWorldImportersDW</p>
+        </header>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="chartType">Chart Type:</label>
+                <select id="chartType">
+                    <option value="line">Line Chart</option>
+                    <option value="bar">Bar Chart</option>
+                    <option value="combined">Combined View</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="dataView">Data View:</label>
+                <select id="dataView">
+                    <option value="absolute">Absolute Values</option>
+                    <option value="growth">Growth Percentages</option>
+                    <option value="both">Both Views</option>
+                </select>
+            </div>
+            <button id="exportData" class="export-btn">Export Data</button>
+            <button id="refreshData" class="refresh-btn">Refresh from Supabase</button>
+        </div>
+
+        <div class="dashboard">
+            <div class="kpi-cards">
+                <div class="kpi-card">
+                    <h3>Total Revenue (12M)</h3>
+                    <div class="kpi-value" id="totalRevenue">$0</div>
+                    <div class="kpi-change" id="revenueChange">0%</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Total Margin (12M)</h3>
+                    <div class="kpi-value" id="totalMargin">$0</div>
+                    <div class="kpi-change" id="marginChange">0%</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Avg Margin %</h3>
+                    <div class="kpi-value" id="avgMarginPct">0%</div>
+                    <div class="kpi-change" id="marginPctChange">0%</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Total Transactions</h3>
+                    <div class="kpi-value" id="totalTransactions">0</div>
+                    <div class="kpi-change" id="transactionChange">0%</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="mainChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="growthChart"></canvas>
+            </div>
+
+            <div class="data-table-container">
+                <h3>Detailed Data Table</h3>
+                <div class="table-wrapper">
+                    <table id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Revenue</th>
+                                <th>Margin</th>
+                                <th>Margin %</th>
+                                <th>Revenue Growth</th>
+                                <th>Transactions</th>
+                                <th>Avg Transaction</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <h3>About This Analysis</h3>
+            <p>This dashboard displays 12-month revenue and margin trends from the WideWorldImportersDW database. 
+               The data is processed and stored in Supabase for real-time visualization and is fully compatible 
+               with PowerBI and Kyvos for advanced analytics.</p>
+            
+            <h4>Key Metrics:</h4>
+            <ul>
+                <li><strong>Total Revenue:</strong> Sum of all sales including tax</li>
+                <li><strong>Total Margin:</strong> Profit from all transactions</li>
+                <li><strong>Margin Percentage:</strong> Profit margin as percentage of revenue</li>
+                <li><strong>Growth Rates:</strong> Month-over-month percentage changes</li>
+            </ul>
+
+            <h4>Data Sources:</h4>
+            <ul>
+                <li>Fact.Sale table (transaction data)</li>
+                <li>Dimension.Date table (time hierarchy)</li>
+                <li>Rolling 12-month window for trend analysis</li>
+            </ul>
+        </div>
+
+        <footer class="footer">
+            <p>&copy; 2025 WideWorldImporters Data Warehouse Analysis | 
+               Generated: <span id="lastUpdated"></span> | 
+               <a href="../exports/revenue_margin_trends.csv" download>Download CSV</a> | 
+               <a href="../exports/revenue_margin_trends.json" download>Download JSON</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

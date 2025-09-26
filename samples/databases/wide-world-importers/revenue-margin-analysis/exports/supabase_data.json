@@ -1,0 +1,110 @@
+[
+  {
+    "month_year": "Oct-2024",
+    "total_revenue": 1031616.14,
+    "total_margin": 193128.93,
+    "margin_percentage": 18.72,
+    "revenue_growth_pct": null,
+    "transaction_count": 1450,
+    "created_at": "2025-09-26T16:10:37.034741"
+  },
+  {
+    "month_year": "Nov-2024",
+    "total_revenue": 954098.18,
+    "total_margin": 221262.62,
+    "margin_percentage": 23.19,
+    "revenue_growth_pct": 2.53,
+    "transaction_count": 1394,
+    "created_at": "2025-09-26T16:10:37.034748"
+  },
+  {
+    "month_year": "Dec-2024",
+    "total_revenue": 930549.74,
+    "total_margin": 186434.11,
+    "margin_percentage": 20.03,
+    "revenue_growth_pct": -21.36,
+    "transaction_count": 1691,
+    "created_at": "2025-09-26T16:10:37.034751"
+  },
+  {
+    "month_year": "Jan-2025",
+    "total_revenue": 1183283.78,
+    "total_margin": 283104.49,
+    "margin_percentage": 23.93,
+    "revenue_growth_pct": 19.87,
+    "transaction_count": 1459,
+    "created_at": "2025-09-26T16:10:37.034757"
+  },
+  {
+    "month_year": "Feb-2025",
+    "total_revenue": 987129.76,
+    "total_margin": 157909.07,
+    "margin_percentage": 16.0,
+    "revenue_growth_pct": 0.38,
+    "transaction_count": 1204,
+    "created_at": "2025-09-26T16:10:37.034759"
+  },
+  {
+    "month_year": "Mar-2025",
+    "total_revenue": 983411.91,
+    "total_margin": 217147.47,
+    "margin_percentage": 22.08,
+    "revenue_growth_pct": -2.26,
+    "transaction_count": 1463,
+    "created_at": "2025-09-26T16:10:37.034761"
+  },
+  {
+    "month_year": "Apr-2025",
+    "total_revenue": 1006162.38,
+    "total_margin": 185877.47,
+    "margin_percentage": 18.47,
+    "revenue_growth_pct": 0.29,
+    "transaction_count": 1385,
+    "created_at": "2025-09-26T16:10:37.034762"
+  },
+  {
+    "month_year": "May-2025",
+    "total_revenue": 1003242.56,
+    "total_margin": 179168.83,
+    "margin_percentage": 17.86,
+    "revenue_growth_pct": 6.35,
+    "transaction_count": 1670,
+    "created_at": "2025-09-26T16:10:37.034764"
+  },
+  {
+    "month_year": "Jun-2025",
+    "total_revenue": 943363.35,
+    "total_margin": 151810.68,
+    "margin_percentage": 16.09,
+    "revenue_growth_pct": -1.93,
+    "transaction_count": 1600,
+    "created_at": "2025-09-26T16:10:37.034766"
+  },
+  {
+    "month_year": "Jul-2025",
+    "total_revenue": 961949.97,
+    "total_margin": 209581.37,
+    "margin_percentage": 21.79,
+    "revenue_growth_pct": 7.99,
+    "transaction_count": 1497,
+    "created_at": "2025-09-26T16:10:37.034767"
+  },
+  {
+    "month_year": "Aug-2025",
+    "total_revenue": 890740.79,
+    "total_margin": 160963.45,
+    "margin_percentage": 18.07,
+    "revenue_growth_pct": -5.66,
+    "transaction_count": 1558,
+    "created_at": "2025-09-26T16:10:37.034769"
+  },
+  {
+    "month_year": "Sep-2025",
+    "total_revenue": 944179.99,
+    "total_margin": 197245.63,
+    "margin_percentage": 20.89,
+    "revenue_growth_pct": 5.26,
+    "transaction_count": 1722,
+    "created_at": "2025-09-26T16:10:37.034771"
+  }
+]
