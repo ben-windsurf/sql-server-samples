@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WideWorldImporters Revenue & Margin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card h3 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-top: 1rem;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .metric-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #667eea;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            color: #718096;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background-color: #f7fafc;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        tr:hover {
+            background-color: #f7fafc;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            color: #718096;
+        }
+        
+        .error {
+            color: #e53e3e;
+            text-align: center;
+            padding: 1rem;
+            background-color: #fed7d7;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .refresh-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: opacity 0.2s ease;
+            margin-bottom: 1rem;
+        }
+        
+        .refresh-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .refresh-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>WideWorldImporters Dashboard</h1>
+        <p>Revenue & Margin Trends Analysis</p>
+    </div>
+    
+    <div class="container">
+        <button class="refresh-btn" onclick="refreshData()">Refresh Data</button>
+        
+        <div class="metrics-grid" id="metricsGrid">
+            <div class="metric-card">
+                <div class="metric-value" id="totalRevenue">-</div>
+                <div class="metric-label">Total Revenue (12M)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="totalMargin">-</div>
+                <div class="metric-label">Total Margin (12M)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="avgMarginPercent">-</div>
+                <div class="metric-label">Avg Margin %</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="totalTransactions">-</div>
+                <div class="metric-label">Total Transactions</div>
+            </div>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>Monthly Revenue & Margin Trends</h3>
+                <div class="chart-container">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Quarterly Performance</h3>
+                <div class="chart-container">
+                    <canvas id="quarterlyChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>Top 10 Products by Revenue</h3>
+                <div class="table-container">
+                    <table id="productsTable">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Revenue</th>
+                                <th>Margin</th>
+                                <th>Margin %</th>
+                                <th>Sales</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                            <tr><td colspan="5" class="loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Top 10 Customers by Revenue</h3>
+                <div class="table-container">
+                    <table id="customersTable">
+                        <thead>
+                            <tr>
+                                <th>Customer</th>
+                                <th>Revenue</th>
+                                <th>Margin</th>
+                                <th>Margin %</th>
+                                <th>Orders</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTableBody">
+                            <tr><td colspan="5" class="loading">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://kzujalwtfxipkvjeqtms.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6dWphbHd0ZnhpcGt2amVxdG1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY5MDQ3NzgsImV4cCI6MjA3MjQ4MDc3OH0.ynWu6_l18rOe3UAk_pkvmnqy6W7CVMabIrtJRUtISr4';
+        
+        let monthlyChart, quarterlyChart;
+        
+        // Utility functions
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+        
+        function formatNumber(num) {
+            return new Intl.NumberFormat('en-US').format(num);
+        }
+        
+        // API functions
+        async function fetchData(table) {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error(`Error fetching ${table}:`, error);
+                return [];
+            }
+        }
+        
+        // Chart creation functions
+        function createMonthlyChart(data) {
+            const ctx = document.getElementById('monthlyChart').getContext('2d');
+            
+            if (monthlyChart) {
+                monthlyChart.destroy();
+            }
+            
+            const sortedData = data.sort((a, b) => {
+                if (a.year !== b.year) return a.year - b.year;
+                return a.month - b.month;
+            });
+            
+            monthlyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: sortedData.map(d => d.month_year),
+                    datasets: [{
+                        label: 'Revenue',
+                        data: sortedData.map(d => d.revenue),
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    }, {
+                        label: 'Margin',
+                        data: sortedData.map(d => d.margin),
+                        borderColor: '#764ba2',
+                        backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    }, {
+                        label: 'Margin %',
+                        data: sortedData.map(d => d.margin_percentage),
+                        borderColor: '#f093fb',
+                        backgroundColor: 'rgba(240, 147, 251, 0.1)',
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Month'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Revenue / Margin ($)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return formatCurrency(value);
+                                }
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Margin %'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.dataset.label === 'Margin %') {
+                                        label += context.parsed.y + '%';
+                                    } else {
+                                        label += formatCurrency(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createQuarterlyChart(data) {
+            const ctx = document.getElementById('quarterlyChart').getContext('2d');
+            
+            if (quarterlyChart) {
+                quarterlyChart.destroy();
+            }
+            
+            const sortedData = data.sort((a, b) => {
+                if (a.year !== b.year) return a.year - b.year;
+                return a.quarter - b.quarter;
+            });
+            
+            quarterlyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedData.map(d => `${d.year} ${d.quarter_label}`),
+                    datasets: [{
+                        label: 'Revenue',
+                        data: sortedData.map(d => d.revenue),
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                        borderColor: '#667eea',
+                        borderWidth: 1
+                    }, {
+                        label: 'Margin',
+                        data: sortedData.map(d => d.margin),
+                        backgroundColor: 'rgba(118, 75, 162, 0.8)',
+                        borderColor: '#764ba2',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Amount ($)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return formatCurrency(value);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + formatCurrency(context.parsed.y);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Table population functions
+        function populateProductsTable(data) {
+            const tbody = document.getElementById('productsTableBody');
+            tbody.innerHTML = '';
+            
+            data.forEach(product => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${product.product_name}</td>
+                    <td>${formatCurrency(product.total_revenue)}</td>
+                    <td>${formatCurrency(product.total_margin)}</td>
+                    <td>${product.margin_percentage.toFixed(1)}%</td>
+                    <td>${formatNumber(product.sales_count)}</td>
+                `;
+            });
+        }
+        
+        function populateCustomersTable(data) {
+            const tbody = document.getElementById('customersTableBody');
+            tbody.innerHTML = '';
+            
+            data.forEach(customer => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${customer.customer_name}</td>
+                    <td>${formatCurrency(customer.total_revenue)}</td>
+                    <td>${formatCurrency(customer.total_margin)}</td>
+                    <td>${customer.margin_percentage.toFixed(1)}%</td>
+                    <td>${formatNumber(customer.order_count)}</td>
+                `;
+            });
+        }
+        
+        // Metrics calculation
+        function updateMetrics(monthlyData) {
+            const totalRevenue = monthlyData.reduce((sum, d) => sum + parseFloat(d.revenue), 0);
+            const totalMargin = monthlyData.reduce((sum, d) => sum + parseFloat(d.margin), 0);
+            const totalTransactions = monthlyData.reduce((sum, d) => sum + parseInt(d.transaction_count), 0);
+            const avgMarginPercent = totalRevenue > 0 ? (totalMargin / totalRevenue) * 100 : 0;
+            
+            document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
+            document.getElementById('totalMargin').textContent = formatCurrency(totalMargin);
+            document.getElementById('avgMarginPercent').textContent = avgMarginPercent.toFixed(1) + '%';
+            document.getElementById('totalTransactions').textContent = formatNumber(totalTransactions);
+        }
+        
+        // Main data loading function
+        async function loadDashboardData() {
+            try {
+                const [monthlyData, quarterlyData, productsData, customersData] = await Promise.all([
+                    fetchData('monthly_trends'),
+                    fetchData('quarterly_trends'),
+                    fetchData('top_products'),
+                    fetchData('top_customers')
+                ]);
+                
+                if (monthlyData.length > 0) {
+                    createMonthlyChart(monthlyData);
+                    updateMetrics(monthlyData);
+                }
+                
+                if (quarterlyData.length > 0) {
+                    createQuarterlyChart(quarterlyData);
+                }
+                
+                if (productsData.length > 0) {
+                    populateProductsTable(productsData);
+                }
+                
+                if (customersData.length > 0) {
+                    populateCustomersTable(customersData);
+                }
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                document.querySelectorAll('.loading').forEach(el => {
+                    el.innerHTML = '<div class="error">Error loading data. Please try refreshing.</div>';
+                });
+            }
+        }
+        
+        // Refresh function
+        async function refreshData() {
+            const btn = document.querySelector('.refresh-btn');
+            btn.disabled = true;
+            btn.textContent = 'Refreshing...';
+            
+            await loadDashboardData();
+            
+            btn.disabled = false;
+            btn.textContent = 'Refresh Data';
+        }
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+        });
+    </script>
+</body>
+</html>

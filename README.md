@@ -16,6 +16,46 @@ Releases provide convenient downloads of sample databases and applications, elim
 To see the complete list of resources in this repository, navigate to [Releases](https://github.com/Microsoft/sql-server-samples/releases)
 (this now includes an entity diagram of Northwind database) to help visual learners.
 
+## WideWorldImporters Revenue & Margin Dashboard
+
+This repository includes a comprehensive interactive dashboard for analyzing 12-month revenue and margin trends from the WideWorldImportersDW database. The dashboard provides business intelligence insights through modern web visualizations and integrates with Supabase for cloud data hosting.
+
+### Features
+
+- **Interactive Visualizations**: Monthly and quarterly revenue/margin trend charts using Chart.js
+- **Business Analytics**: Top products and customer segment analysis with performance metrics
+- **Real-time Data**: Supabase integration for live dashboard updates
+- **Responsive Design**: Modern web interface that works across devices
+- **Growth Analysis**: Month-over-month and quarter-over-quarter growth calculations
+
+### Components
+
+The dashboard solution consists of four main components:
+
+1. **SQL Queries** (`revenue-margin-queries.sql`): Comprehensive queries for extracting revenue and margin trends from WideWorldImportersDW, including monthly/quarterly aggregations and top performer analysis.
+
+2. **Data Importer** (`data-importer.py`): Python script that connects to the database, executes queries, and loads results into Supabase tables for dashboard consumption.
+
+3. **Interactive Dashboard** (`dashboard/index.html`): Modern web interface with Chart.js visualizations, including line charts for trends, bar charts for comparisons, and data tables for detailed analysis.
+
+4. **Deployment Configuration** (`dashboard/edge-function.js`): Supabase Edge Function for production hosting and API endpoints.
+
+### Quick Start
+
+1. **Set up Supabase**: Configure your Supabase project and obtain API keys
+2. **Import Data**: Run `python data-importer.py` to load sample data
+3. **View Dashboard**: Open `dashboard/index.html` in a web browser or deploy via Supabase Edge Functions
+
+For detailed setup instructions, configuration options, and customization guidance, see [`README-dashboard.md`](README-dashboard.md).
+
+### Database Requirements
+
+The dashboard is designed to work with the WideWorldImportersDW sample database and uses the following key tables:
+- `Fact.Sale` - Sales transaction data with revenue and margin columns
+- `Dimension.Date` - Date dimension for time-based aggregations
+- `Dimension.Stock Item` - Product information for top products analysis
+- `Dimension.Customer` - Customer data for segment analysis
+
 ## Working in GitHub
 To contribute on GitHub, follow these steps:
 
